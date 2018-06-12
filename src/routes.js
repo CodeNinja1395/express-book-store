@@ -1,37 +1,59 @@
 const Books = require('../model/books');
+const Joi = require('../model/validator');
 
 module.exports = function (app, db) {
-  let books;
-  Books.getBooks((err, res) => {
-    books = res;
+
+
+  app.post('/book', (req, res) => {
+    let book = req.body;
+    Books.addBook(book, (err, books) => {
+
+      if(err) {
+        console.log(err);
+      }
+      res.json(book)
+
+    })
+  });
+  app.post('/book/:_id', (req, res) => {
+    let id = req.params._id;
+    let book = req.body;
+    console.log(req.body);
+    Books.updateBook(id, book, {}, (err, book) => {
+      if(err){
+        throw err;
+      }
+      res.send(book);
+    });
   });
 
   app.get('/', (req, res) => {
+
     res.send('homepage');
   });
 
   app.get('/books', (req, res) => {
-      res.json(books.filter((e) => {
-        return !e.isDeleted;
-      }));
+
+    Books.getBooks((err, books) => {
+      if (!err) {
+        res.json(books.filter((e) => {
+          return !e.isDeleted;
+        }));
+      }
+    });
+
   });
 
-  app.get(/book/, (req, res) => {
-    reqID = req.path.substring(req.path.lastIndexOf('/')+1);
+  app.get(`/book/:_id`, (req, res) => {
 
-    books.forEach( (e) => {
-
-      if (e._id == reqID && !e.isDeleted) {
-        return res.json(e);
-      }
-
+    Books.getBookById(req.params._id, (err, book) => {
+        if(err) {
+          return  res.status(404)
+            .send('book not found');
+        } else {
+            res.json(book);
+        }
     });
-    try {
-      return res.status(404)
-        .send('BOOK NOT FOUND')
-    } catch (e) {
-      
-    }
 
   });
 };
