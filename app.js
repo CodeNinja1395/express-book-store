@@ -4,8 +4,6 @@ const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
 
-const db = require('./config/db');
-
 mongoose.connect('mongodb://localhost:27017/book_store');
 const dbase = mongoose.connection;
 
