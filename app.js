@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 mongoose.connect('mongodb://localhost:27017/book_store');
 const dbase = mongoose.connection;
@@ -12,6 +13,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 //-------------------------------------------//
 
 

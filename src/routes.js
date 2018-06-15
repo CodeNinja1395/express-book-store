@@ -40,7 +40,11 @@ module.exports = function (app) {
 
   app.get('/', (req, res) => {
 
-    res.send(html);
+    res.send(`use GET /books to get list of books 
+use GET /book/\'id\' to find certain book 
+use POST /book/ to add a book
+use POST /book/\'id\' to update a book
+use DELETE /book/\'id\' to delete book'`)
   });
 
   app.get('/books', (req, res) => {
