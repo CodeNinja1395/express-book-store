@@ -1,5 +1,8 @@
 const Books = require('../model/books');
 const Joi = require('../model/validator')
+const _ = require('underscore');
+
+
 
 module.exports = function (app) {
 
@@ -38,32 +41,40 @@ module.exports = function (app) {
 
   app.get('/', (req, res) => {
 
-    res.send('homepage');
+    res.send(html);
   });
 
   app.get('/books', (req, res) => {
 
-    Books.getBooks((err, books) => {
-      if (!err) {
-        res.json(books.filter((e) => {
-          return !e.isDeleted;
-        }));
-      }
-    });
 
+    Books.getBooks((err, books) => {
+
+      if (!err) {
+        let listOfBooks = [];
+        books.forEach((e) => {
+
+          if (!e.isDeleted)
+            listOfBooks.push(_.pick(e, 'name', 'author'));
+
+        });
+        res.json(listOfBooks);
+      }
+
+    });
   });
 
   app.get(`/book/:_id`, (req, res) => {
 
     Books.getBookById(req.params._id, (err, book) => {
+
         if(err) {
           return  res.status(404)
             .send('book not found');
         } else {
             res.json(book);
         }
-    });
 
+    });
   });
 
   app.delete(`/book/:_id`, (req, res) => {
