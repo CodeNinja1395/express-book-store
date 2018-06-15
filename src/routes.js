@@ -6,7 +6,6 @@ const _ = require('underscore');
 
 module.exports = function (app) {
 
-
   app.post('/book', (req, res) => {
     let book = req.body;
     Joi.validateReq(book, (err, valid) => {
@@ -54,7 +53,7 @@ module.exports = function (app) {
         books.forEach((e) => {
 
           if (!e.isDeleted)
-            listOfBooks.push(_.pick(e, 'name', 'author'));
+            listOfBooks.push(_.pick(e, 'name', 'author', ));
 
         });
         res.json(listOfBooks);
@@ -67,11 +66,11 @@ module.exports = function (app) {
 
     Books.getBookById(req.params._id, (err, book) => {
 
-        if(err) {
+        if(err || book.isDeleted) {
           return  res.status(404)
             .send('book not found');
         } else {
-            res.json(book);
+            res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
         }
 
     });
