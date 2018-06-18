@@ -57,7 +57,7 @@ use DELETE /book/\'id\' to delete book'`)
         books.forEach((e) => {
 
           if (!e.isDeleted)
-            listOfBooks.push(_.pick(e, 'name', 'author', ));
+            listOfBooks.push(_.pick(e, 'name', 'author', '_id'));
 
         });
         res.json(listOfBooks);
