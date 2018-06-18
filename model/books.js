@@ -42,14 +42,11 @@ module.exports.updateBook = (id, book, options, callback) => {
   }
   Books.update(query, update, callback);
 }
-module.exports.deleteBook = (id, book, req, callback) => {
+module.exports.deleteBook = (id, req, callback) => {
   let query = {_id: id};
-
-  if (req.body.flush === '1' && req.headers.authorization === 'ff62855f-d2cb-4e9a-9816-c6f4045e4665') {
-      console.log('deleted');
-      Books.remove(query, callback);
-  } else {
-      Books.update(query, {isDeleted: true}, callback);
-  }
-
+  Books.remove(query, callback);
+}
+module.exports.softDeleteBook = (id, req, callback) => {
+  let query = {_id: id};
+  Books.update(query, {isDeleted: true}, callback);
 }

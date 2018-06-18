@@ -1,14 +1,28 @@
 const Books = require('../model/books');
-const Joi = require('../model/validator')
+const Joi = require('joi');
 const _ = require('underscore');
+const Controller = require('../controller/controller');
 
+
+const schemaRequired = Joi.object().keys({
+  name: Joi.string().regex(/^[a-zA-Z0-9\s]+$/).required(),
+  author: Joi.string().regex(/^[a-zA-Z0-9\s]+$/).required(),
+  isDeleted: Joi.boolean()
+
+});
+const schemaOptional = Joi.object().keys({
+  name: Joi.string().regex(/^[a-zA-Z0-9\s]+$/),
+  author: Joi.string().regex(/^[a-zA-Z0-9\s]+$/),
+  isDeleted: Joi.boolean()
+
+});
 
 
 module.exports = function (app) {
 
   app.post('/book', (req, res) => {
     let book = req.body;
-    Joi.validateReq(book, (err, valid) => {
+    Joi.validate(book, schemaRequired, (err, valid) => {
       if (err){
         console.log(err);
       }
@@ -26,7 +40,7 @@ module.exports = function (app) {
   app.post('/book/:_id', (req, res) => {
     let id = req.params._id;
     let book = req.body;
-    Joi.validateOptional(book, (err, valid) => {
+    Joi.validate(book, schemaOptional, (err, valid) => {
       Books.updateBook(id, valid, {}, (err, book) => {
 
         if(err){
@@ -40,9 +54,9 @@ module.exports = function (app) {
 
   app.get('/', (req, res) => {
 
-    res.send(`use GET /books to get list of books 
-use GET /book/\'id\' to find certain book 
-use POST /book/ to add a book
+    res.send(`use GET /books to get list of books
+    use GET /book/\'id\' to find certain book
+  use POST /book/ to add a book
 use POST /book/\'id\' to update a book
 use DELETE /book/\'id\' to delete book'`)
   });
@@ -57,10 +71,10 @@ use DELETE /book/\'id\' to delete book'`)
         books.forEach((e) => {
 
           if (!e.isDeleted)
-            listOfBooks.push(_.pick(e, 'name', 'author', ));
+            listOfBooks.push(_.pick(e, 'name', 'author', '_id'));
 
         });
-        res.json(listOfBooks);
+        res.send(listOfBooks);
       }
 
     });
@@ -84,12 +98,14 @@ use DELETE /book/\'id\' to delete book'`)
 
     Books.getBookById(req.params._id, (err, book) => {
 
-        Books.deleteBook(req.params._id, book, req, (err, book) => {
-          if (err) {
-            console.log(err);
-          }
+        if(!err){
+          Controller.deleteBook(req.params._id,  req, (err, book) => {
+            if (err) {
+              console.log(err);
+            }
 
-        });
+          });
+        }
 
         res.send(book)
 

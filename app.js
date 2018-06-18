@@ -1,11 +1,10 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-mongoose.connect('mongodb://localhost:27017/book_store');
+mongoose.connect(require('./config/config').mongoURL);
 const dbase = mongoose.connection;
 
 const app = express();
