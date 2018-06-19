@@ -22,31 +22,37 @@ let bookSchema = mongoose.Schema({
 const Books = module.exports = mongoose.model('Books', bookSchema);
 //get Book
 module.exports.getBooks = (callback) => {
-  Books.find(callback);
+  return Books.find(callback);
 }
 //get Book by ID
 module.exports.getBookById = (id,callback) => {
-  Books.findById(id, callback);
+  return Books.findById(id, callback);
 }
 //add Book
 module.exports.addBook = (book, callback) => {
-  Books.create(book, callback);
+  return Books.create(book, callback);
 }
 
 //update Book
 module.exports.updateBook = (id, book, options, callback) => {
   let query = {_id: id};
   let update = {
-      name: book.name,
-      author: book.author
   }
-  Books.update(query, update, callback);
+      {
+        if (book.name) update.name =  book.name;
+        if (book.author) update.author = book.author;
+        if (book.isDeleted!== undefined) update.isDeleted = book.isDeleted;
+      }
+
+  return Books.update(query, update, callback);
 }
+//deleteBook
 module.exports.deleteBook = (id, req, callback) => {
   let query = {_id: id};
-  Books.remove(query, callback);
+  return Books.remove(query, callback);
 }
+//softDeleteBook
 module.exports.softDeleteBook = (id, req, callback) => {
   let query = {_id: id};
-  Books.update(query, {isDeleted: true}, callback);
+  return Books.update(query, {isDeleted: true}, callback);
 }

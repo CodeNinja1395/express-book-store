@@ -3,7 +3,6 @@ const Joi = require('joi');
 const _ = require('underscore');
 const Controller = require('../controller/controller');
 
-
 const schemaRequired = Joi.object().keys({
   name: Joi.string().regex(/^[a-zA-Z0-9\s]+$/).required(),
   author: Joi.string().regex(/^[a-zA-Z0-9\s]+$/).required(),
@@ -20,95 +19,77 @@ const schemaOptional = Joi.object().keys({
 
 module.exports = function (app) {
 
-  app.post('/book', (req, res) => {
-    let book = req.body;
-    Joi.validate(book, schemaRequired, (err, valid) => {
-      if (err){
-        console.log(err);
-      }
-      Books.addBook(valid, (err, books) => {
+  app.post('/book', async (req, res) => {
+    try {
+      let book = await Joi.validate(req.body, schemaRequired);
+      await Books.addBook(book);
+      await res.json(book)
+    } catch (e) {
+       console.log(e);
+    }
 
-        if(err) {
-          console.log(err);
-        }
-        res.json(book)
-
-      });
-    });
   });
 
-  app.post('/book/:_id', (req, res) => {
-    let id = req.params._id;
-    let book = req.body;
-    Joi.validate(book, schemaOptional, (err, valid) => {
-      Books.updateBook(id, valid, {}, (err, book) => {
+  app.post('/book/:_id', async (req, res) => {
+    try {
+      let book = await Joi.validate(req.body, schemaOptional);
+      await Books.updateBook(req.params._id, book, {});
 
-        if(err){
-          throw err;
-        }
-        res.send(book);
+      let bookByID = await Books.getBookById(req.params._id);
+      await res.json(bookByID);
+    } catch(e){
+      console.log(e);
+    }
 
-      });
-    })
   });
 
-  app.get('/', (req, res) => {
+  app.get('/', async (req, res) => {
 
-    res.send(`use GET /books to get list of books
+    await res.send(`use GET /books to get list of books
     use GET /book/\'id\' to find certain book
-  use POST /book/ to add a book
-use POST /book/\'id\' to update a book
-use DELETE /book/\'id\' to delete book`)
+    use POST /book/ to add a book
+    use POST /book/\'id\' to update a book
+    use DELETE /book/\'id\' to delete book`)
   });
 
-  app.get('/books', (req, res) => {
+  app.get('/books', async (req, res) => {
+    try {
+      let books = await Books.getBooks();
+      let listOfBooks = [];
 
+      books.forEach((e) => {
+        if (!e.isDeleted)
+          listOfBooks.push(_.pick(e, 'name', 'author', '_id'));
 
-    Books.getBooks((err, books) => {
+      });
 
-      if (!err) {
-        let listOfBooks = [];
-        books.forEach((e) => {
+      await res.json(listOfBooks);
 
-          if (!e.isDeleted)
-            listOfBooks.push(_.pick(e, 'name', 'author', '_id'));
-
-        });
-        res.send(listOfBooks);
-      }
-
-    });
+    } catch (e) {
+        console.log(e);
+    }
   });
 
-  app.get(`/book/:_id`, (req, res) => {
+  app.get(`/book/:_id`, async (req, res) => {
+    try {
+      let book = await Books.getBookById(req.params._id);
 
-    Books.getBookById(req.params._id, (err, book) => {
-
-        if(err || book.isDeleted) {
-          return  res.status(404)
+        if(book.isDeleted) {
+          await res.status(404)
             .send('book not found');
         } else {
-            res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
+          await res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
         }
 
-    });
+    } catch (e) {
+      res.status(404)
+        .send('book not found');
+    }
   });
 
-  app.delete(`/book/:_id`, (req, res) => {
+  app.delete(`/book/:_id`, async (req, res) => {
+    let book = await Controller.deleteBook(req.params._id, req);
+    await res.json(book);
 
-    Books.getBookById(req.params._id, (err, book) => {
-
-        if(!err){
-          Controller.deleteBook(req.params._id,  req, (err, book) => {
-            if (err) {
-              console.log(err);
-            }
-
-          });
-        }
-
-        res.send(book)
-
-    });
   });
 };
