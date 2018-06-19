@@ -58,7 +58,7 @@ module.exports = function (app) {
     use GET /book/\'id\' to find certain book
   use POST /book/ to add a book
 use POST /book/\'id\' to update a book
-use DELETE /book/\'id\' to delete book'`)
+use DELETE /book/\'id\' to delete book`)
   });
 
   app.get('/books', (req, res) => {
