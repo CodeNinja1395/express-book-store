@@ -1,8 +1,10 @@
+require('babel-polyfill');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
 
 mongoose.connect(require('./config/config').mongoURL);
 const dbase = mongoose.connection;
@@ -17,6 +19,6 @@ app.use(cors());
 
 
 require('./src')(app);
-app.listen(3000, () => {
-  console.log('Server started on port 3000...');
+app.listen(80, () => {
+  console.log('Server started on port 80...');
 });

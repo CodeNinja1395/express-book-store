@@ -1,9 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: {
-    app: './app.js'
-  },
+  entry: ['babel-polyfill', './app.js'],
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'build'),
