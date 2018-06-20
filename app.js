@@ -7,7 +7,6 @@ const cors = require('cors');
 
 
 mongoose.connect(require('./config/config').mongoURL);
-const dbase = mongoose.connection;
 
 const app = express();
 //---------------middlevare------------------//
@@ -20,5 +19,5 @@ app.use(cors());
 
 require('./src')(app);
 app.listen(3000, () => {
-  console.log('Server started on port 3000...');
+    console.log('Server started on port 3000...');
 });
