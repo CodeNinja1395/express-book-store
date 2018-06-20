@@ -33,7 +33,7 @@ module.exports.addBook = (book) => {
     return Books.create(book);
 };
 //update Book
-module.exports.updateBook = (id, book, options) => {
+module.exports.updateBook = (id, book) => {
     let query = {_id: id};
     let update = {};
 
@@ -46,10 +46,10 @@ module.exports.updateBook = (id, book, options) => {
     return Books.update(query, update);
 };
 //deleteBook
-module.exports.deleteBook = (id, req) => {
+module.exports.deleteBook = (id) => {
     return Books.remove({_id: id});
 };
 //softDeleteBook
-module.exports.softDeleteBook = (id, req) => {
+module.exports.softDeleteBook = (id) => {
     return Books.findOneAndUpdate({_id: id}, {isDeleted: true});
 };
