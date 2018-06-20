@@ -21,20 +21,20 @@ let bookSchema = mongoose.Schema({
 
 const Books = module.exports = mongoose.model('Books', bookSchema);
 //get Book
-module.exports.getBooks = (callback) => {
-  return Books.find(callback);
+module.exports.getBooks = () => {
+  return Books.find({isDeleted: false});
 }
 //get Book by ID
-module.exports.getBookById = (id,callback) => {
-  return Books.findById(id, callback);
+module.exports.getBookById = (id) => {
+  return Books.findById(id);
 }
 //add Book
-module.exports.addBook = (book, callback) => {
-  return Books.create(book, callback);
+module.exports.addBook = (book) => {
+  return Books.create(book);
 }
 
 //update Book
-module.exports.updateBook = (id, book, options, callback) => {
+module.exports.updateBook = (id, book, options) => {
   let query = {_id: id};
   let update = {
   }
@@ -44,15 +44,14 @@ module.exports.updateBook = (id, book, options, callback) => {
         if (book.isDeleted!== undefined) update.isDeleted = book.isDeleted;
       }
 
-  return Books.update(query, update, callback);
+  return Books.update(query, update);
 }
 //deleteBook
-module.exports.deleteBook = (id, req, callback) => {
-  let query = {_id: id};
-  return Books.remove(query, callback);
+module.exports.deleteBook = (id, req) => {
+  return Books.remove({_id: id});
 }
 //softDeleteBook
-module.exports.softDeleteBook = (id, req, callback) => {
-  let query = {_id: id};
-  return Books.update(query, {isDeleted: true}, callback);
+module.exports.softDeleteBook = (id, req) => {
+  return Books.findOneAndUpdate({_id: id}, {isDeleted: true});
+
 }

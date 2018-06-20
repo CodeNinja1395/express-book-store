@@ -1,7 +1,7 @@
-const Books = require('../model/books');
+const Books = require('./model/books');
 const Joi = require('joi');
 const _ = require('underscore');
-const Controller = require('../controller/controller');
+const config = require('../config/config');
 
 const schemaRequired = Joi.object().keys({
   name: Joi.string().regex(/^[a-zA-Z0-9\s]+$/).required(),
@@ -21,9 +21,9 @@ module.exports = function (app) {
 
   app.post('/book', async (req, res) => {
     try {
-      let book = await Joi.validate(req.body, schemaRequired);
+      const book = await Joi.validate(req.body, schemaRequired);
       await Books.addBook(book);
-      await res.json(book)
+      res.json(book)
     } catch (e) {
        console.log(e);
     }
@@ -32,20 +32,21 @@ module.exports = function (app) {
 
   app.post('/book/:_id', async (req, res) => {
     try {
-      let book = await Joi.validate(req.body, schemaOptional);
+      const book = await Joi.validate(req.body, schemaOptional);
       await Books.updateBook(req.params._id, book, {});
 
-      let bookByID = await Books.getBookById(req.params._id);
-      await res.json(bookByID);
+      const bookByID = await Books.getBookById(req.params._id);
+
+      res.json(bookByID);
+
     } catch(e){
       console.log(e);
     }
-
   });
 
   app.get('/', async (req, res) => {
 
-    await res.send(`use GET /books to get list of books
+    res.send(`use GET /books to get list of books
     use GET /book/\'id\' to find certain book
     use POST /book/ to add a book
     use POST /book/\'id\' to update a book
@@ -54,16 +55,12 @@ module.exports = function (app) {
 
   app.get('/books', async (req, res) => {
     try {
-      let books = await Books.getBooks();
-      let listOfBooks = [];
-
-      books.forEach((e) => {
-        if (!e.isDeleted)
-          listOfBooks.push(_.pick(e, 'name', 'author', '_id'));
-
+      const books = await Books.getBooks();
+      const result = books.map((e) => {
+        return _.pick(e, "name", "author", "added_date");
       });
 
-      await res.json(listOfBooks);
+      res.json(result);
 
     } catch (e) {
         console.log(e);
@@ -72,13 +69,13 @@ module.exports = function (app) {
 
   app.get(`/book/:_id`, async (req, res) => {
     try {
-      let book = await Books.getBookById(req.params._id);
+      const book = await Books.getBookById(req.params._id);
 
         if(book.isDeleted) {
-          await res.status(404)
+          res.status(404)
             .send('book not found');
         } else {
-          await res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
+          res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
         }
 
     } catch (e) {
@@ -88,8 +85,21 @@ module.exports = function (app) {
   });
 
   app.delete(`/book/:_id`, async (req, res) => {
-    let book = await Controller.deleteBook(req.params._id, req);
-    await res.json(book);
+
+    try {
+
+      if (req.body.flush === '1' && req.headers.authorization === config.authorization) {
+        const book = await Books.deleteBook(req.params._id);
+        res.json(`book deleted completely`);
+      } else {
+        const book = await Books.softDeleteBook(req.params._id, {isDeleted: true});
+        res.json(`${book.name} is deleted`);
+      }
+
+    } catch (e) {
+      res.send(`error ${e}`);
+    }
+
 
   });
 };
