@@ -37,9 +37,11 @@ module.exports.updateBook = (id, book, options) => {
     let query = {_id: id};
     let update = {};
 
+    // Why is it separated with {}?
     {
         if (book.name) update.name =  book.name;
         if (book.author) update.author = book.author;
+        // Spaces have to be from both sides of operators
         if (book.isDeleted!== undefined) update.isDeleted = book.isDeleted;
     }
 
@@ -50,6 +52,7 @@ module.exports.deleteBook = (id, req) => {
     return Books.remove({_id: id});
 };
 //softDeleteBook
+// Why do you need this function if you can do the same with updateBook?
 module.exports.softDeleteBook = (id, req) => {
     return Books.findOneAndUpdate({_id: id}, {isDeleted: true});
 };
