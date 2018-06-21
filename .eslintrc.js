@@ -7,7 +7,9 @@ module.exports = {
     "parserOptions": {
         "sourceType": "module"
     },
+    "parser": "babel-eslint",
     "rules": {
+        "no-console": 0,
         "indent": [
             "error",
             4

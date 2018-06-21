@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('mongoose');
 
 let bookSchema = mongoose.Schema({
@@ -33,26 +34,20 @@ module.exports.addBook = (book) => {
     return Books.create(book);
 };
 //update Book
-module.exports.updateBook = (id, book, options) => {
+module.exports.updateBook = (id, book) => {
     let query = {_id: id};
     let update = {};
 
-    // Why is it separated with {}?
-    {
-        if (book.name) update.name =  book.name;
-        if (book.author) update.author = book.author;
-        // Spaces have to be from both sides of operators
-        if (book.isDeleted!== undefined) update.isDeleted = book.isDeleted;
-    }
+    if (book.name) update.name =  book.name;
+    if (book.author) update.author = book.author;
 
     return Books.update(query, update);
 };
 //deleteBook
-module.exports.deleteBook = (id, req) => {
+module.exports.deleteBook = (id) => {
     return Books.remove({_id: id});
 };
 //softDeleteBook
-// Why do you need this function if you can do the same with updateBook?
-module.exports.softDeleteBook = (id, req) => {
+module.exports.softDeleteBook = (id) => {
     return Books.findOneAndUpdate({_id: id}, {isDeleted: true});
 };

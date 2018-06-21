@@ -1,4 +1,5 @@
+'use strict';
 const routes = require('./routes');
 module.exports = function (app) {
-  routes(app);
+    routes(app);
 };
