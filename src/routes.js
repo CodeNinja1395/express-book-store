@@ -14,7 +14,7 @@ const schemaOptional = Joi.object().keys({
     isDeleted: Joi.boolean()
 });
 
-module.exports = function (app) {
+module.exports = (app) => {
     app.post('/book', async (req, res) => {
         try {
             const book = await Joi.validate(req.body, schemaRequired);
