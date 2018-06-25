@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('mongoose');
 
 let bookSchema = mongoose.Schema({
@@ -37,11 +38,8 @@ module.exports.updateBook = (id, book) => {
     let query = {_id: id};
     let update = {};
 
-    {
-        if (book.name) update.name =  book.name;
-        if (book.author) update.author = book.author;
-        if (book.isDeleted!== undefined) update.isDeleted = book.isDeleted;
-    }
+    if (book.name) update.name =  book.name;
+    if (book.author) update.author = book.author;
 
     return Books.update(query, update);
 };
