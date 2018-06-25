@@ -14,7 +14,9 @@ const schemaOptional = Joi.object().keys({
     isDeleted: Joi.boolean()
 });
 
+
 module.exports = (app) => {
+
     app.post('/book', async (req, res) => {
         try {
             const book = await Joi.validate(req.body, schemaRequired);
@@ -45,6 +47,7 @@ module.exports = (app) => {
     app.get('/books', async (req, res) => {
         try {
             const books = await Books.getBooks();
+
             console.log(books);
             const result = books.map((book) => {
                 return _.pick(book, 'name', 'author', 'added_date');
@@ -57,6 +60,7 @@ module.exports = (app) => {
     });
 
     app.get('/book/:_id', async (req, res) => {
+
         try { 
             const book = await Books.getBookById(req.params._id);
             if(book.isDeleted) {
@@ -69,6 +73,7 @@ module.exports = (app) => {
         } catch (e) {
             res.status(404)
                 .send('book not found');
+          
         }
     });
 
@@ -85,4 +90,5 @@ module.exports = (app) => {
             res.send(`error ${e}`);
         }
     });
+  
 };
