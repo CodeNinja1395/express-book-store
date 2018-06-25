@@ -57,7 +57,7 @@ module.exports = (app) => {
     });
 
     app.get('/book/:_id', async (req, res) => {
-        try { // Different amount of spaces in the single scope
+        try { 
             const book = await Books.getBookById(req.params._id);
             if(book.isDeleted) {
                 res.status(404)
