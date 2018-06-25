@@ -60,7 +60,6 @@ module.exports = (app) => {
     });
 
     app.get('/book/:_id', async (req, res) => {
-
         try { 
             const book = await Books.getBookById(req.params._id);
             if(book.isDeleted) {
@@ -69,11 +68,9 @@ module.exports = (app) => {
             } else {
                 res.json(_.pick(book, 'name', 'author','_id', 'added_date'));
             }
-
         } catch (e) {
             res.status(404)
-                .send('book not found');
-          
+                .send('book not found');      
         }
     });
 
